@@ -96,29 +96,40 @@ RUN pip3 install \
     tensorboard \
     pygwidgets
 
-RUN pip install \
-    torch==1.10 \
-    torchvision==0.11.1 \
-    -f https://download.pytorch.org/whl/cu111/torch_stable.html
+# RUN pip install \
+#     torch==1.10 \
+#     torchvision==0.11.1 \
+#     -f https://download.pytorch.org/whl/cu111/torch_stable.html
 
 ##################################### gym #####################################
-RUN pip3 install gym[all]
+RUN python3 -m pip install --upgrade pip
+RUN pip3 install gymnasium[all]==0.26.2
+RUN pip install gymnasium[box2d]
+##################################### codon #####################################
+RUN /bin/bash -c "$(curl -fsSL https://exaloop.io/install.sh)"
+RUN export PATH=/home/${USER}/.codon/bin:$PATH
 
-
+##################################### vim-python-ide ######################################
+RUN git clone https://github.com/ARG-NCTU/vim-python-ide.git && \
+    cd vim-python-ide && ./install.sh
 ####################################### pyivp ###########################################
 
 RUN cd ${HOME} && git clone https://github.com/ARG-NCTU/pyivp.git \
     && cd pyivp \
     && make -f oop.Makefile
-##################################### vim-python-ide ######################################
-RUN git clone https://github.com/ARG-NCTU/vim-python-ide.git && \
-    cd vim-python-ide && ./install.sh
 ####################################### openai ###########################################
 RUN pip install openai
+####################################### pypy ###########################################
+RUN apt update
+RUN apt install --yes software-properties-common
+RUN add-apt-repository --yes ppa:pypy/ppa
+RUN apt install -y pypy3
 ##################################### setting #####################################
 
 RUN chown -R ${USER}:${USER} ${HOME}/
-RUN echo "kl ALL=(ALL)  ALL" > /etc/sudoers
+RUN echo "${USER} ALL=(ALL)  NOPASSWD: ALL" > /etc/sudoers
+RUN echo "export PATH=/home/${USER}/.codon/bin:$PATH" > /home/${USER}/.bashrc
+
 
 USER ${USER}
 
