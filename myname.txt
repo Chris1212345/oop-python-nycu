@@ -1,0 +1,6 @@
+ 
+
+binchiling
+111511305
+ hehe
+cat ~/.ssh/key_name.pub 
